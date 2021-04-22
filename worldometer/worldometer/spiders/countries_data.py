@@ -11,7 +11,7 @@ def sanitize(value):
     return float(''.join(value.strip().split('+')[index].split(',')))
 
 
-def toggle_country(check1, check2):
+def toggle_check(check1, check2):
     if not check1:
         return check2
     return check1
@@ -26,12 +26,12 @@ class CountriesDataSpider(scrapy.Spider):
         rows = response.xpath('//table[@id="main_table_countries_today"]/tbody[1]/tr[not(contains(@style,"display: none"))]')
         for row in rows[1:-1]:
             yield {
-                'country': toggle_country(row.xpath('td[2]/a/text()').get(), row.xpath('td[2]/span/text()').get()),
+                'country': toggle_check(row.xpath('td[2]/a/text()').get(), row.xpath('td[2]/span/text()').get()),
                 'total_cases': sanitize(row.xpath('td[3]/text()').get()),
                 'new_cases': sanitize(row.xpath('td[4]/text()').get()),
                 'total_death': sanitize(row.xpath('td[5]/text()').get()),
                 'new_death': sanitize(row.xpath('td[6]/text()').get()),
-                'total_recovered': sanitize(row.xpath('td[7]/text()').get()),
+                'total_recovered': sanitize(toggle_check(row.xpath('td[7]/span/text()').get(), row.xpath('td[7]/text()').get())),
                 'active_cases': sanitize(row.xpath('td[8]/text()').get()),
                 'serious_critical': sanitize(row.xpath('td[9]/text()').get()),
                 'total_cases_per_million': sanitize(row.xpath('td[10]/text()').get()),
